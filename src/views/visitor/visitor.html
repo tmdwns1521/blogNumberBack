@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle Table example</title>
+    <link rel="stylesheet" href="visitor.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+</head>
+<body>
+    <header class="menu">
+        <h1><a href="/visitor"><span>ADMIN</span>ISTRATOR</a></h1>
+        <nav>
+            <ul>
+                <li>
+                    <button id="CPA">CPA DB</button>
+                </li>
+                <li>
+                    <button id="VISITOR">사용자 DB</button>
+                </li>
+                    
+            </ul>
+        </nav>
+        <span>
+            <button id="LOGOUT">로그아웃</button>
+        </span>
+    </header>
+    <div style="min-width: 1300px; margin: 0 15.703125%;"" >
+        <div class="logo" style="text-align: center;">
+            <a href="/"><img src="../../imgs/logo.png" style="width: 230px; height: 100px;"></a>
+          </div>
+        <table class="member" id="products">
+            <form action="" id="setRows">
+            </form>
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>IP</th>
+                    <th>유입경로</th>
+                    <th>브라우저</th>
+                    <th>OS</th>
+                    <th>날짜</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</body>
+<script type="module" src="visitor.js"></script>
+</html>

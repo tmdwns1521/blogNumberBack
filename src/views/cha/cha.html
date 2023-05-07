@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation example - getCurrentPosition()</title>
+</head>
+
+<body>
+    <script>
+        function success({ coords, timestamp }) {
+            const latitude = coords.latitude;   // 위도
+            const longitude = coords.longitude; // 경도
+            
+            alert(`위도: ${latitude}, 경도: ${longitude}, 위치 반환 시간: ${timestamp}`);
+        }
+
+        function error() {
+            alert('미동의시 출석체크를 할수 없습니다.');
+            navigator.geolocation;
+        }
+
+        async function getUserLocation() {
+            data = await navigator.permissions.query({ name: 'geolocation' })
+            navigator.permissions.query({ name: 'geolocation' }).state = 'granted'
+            if (!navigator.geolocation) {
+                throw "위치 정보가 지원되지 않습니다.";
+            }
+            navigator.geolocation.getCurrentPosition(success, error);
+        }
+
+        getUserLocation();
+    </script>
+</body>
+
+</html>
