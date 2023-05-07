@@ -52,6 +52,7 @@ userRouter.post('/createNew', async function (req, res, next) {
 // 업데이트 가축
 userRouter.post('/updateNew', async function (req, res, next) {
 	try {
+		console.log(req.body);
 		const { id, entity_identification_number, gender, parent_entity_identification_number, birth, report_date, modification_date, appraise, delivery_day } = req.body;
 		const sql = "update new_table set entity_identification_number = ?, gender = ?, parent_entity_identification_number = ?, birth = ?, report_date = ?, modification_date = ?, appraise = ?, delivery_day = ? where id = ?"
 		const data = await mysqlWrite.query(sql, [entity_identification_number, gender, parent_entity_identification_number, birth, report_date, modification_date, appraise, delivery_day, id])
