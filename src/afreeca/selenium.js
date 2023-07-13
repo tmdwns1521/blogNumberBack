@@ -1,7 +1,23 @@
-import { Builder, By, Key, until } from 'selenium-webdriver';
+import {Builder, By, Key, until} from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome.js';
+
+// export const createDriver = async () => {
+//
+//   return new Builder()
+//       .forBrowser('chrome')
+//       .setChromeOptions(new chrome.Options().addArguments("--disable-gpu",
+//           "lang=ko_KR"))
+//       .build();
+// };
 
 export const createDriver = async () => {
-  const driver = await new Builder().forBrowser('chrome').build();
+
+  const driver = await new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(new chrome.Options().headless().addArguments("--disable-gpu",
+          "lang=ko_KR"))
+    .build();
+
   return driver;
 };
 

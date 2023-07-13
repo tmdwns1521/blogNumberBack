@@ -11,14 +11,13 @@ import {
     last_handle,
     finallyPaymentCheck
 } from "./charge.js";
+import {mysqlWrite} from "../config/database.js";
 
-const cultureLandCharge = async (driver, money, id, pw) => {
+const cultureLandCharge = async (driver, money, id, pw, insertedId) => {
     try {
         const pointBold = await driver.findElement(By.className('point-bold'));
         let pointCnt = await pointBold.getText()
         pointCnt = Number(pointCnt.split(' ')[1].replace('개', ''));
-        console.log(pointCnt * 100);
-        console.log(money);
         pointCnt = money / (pointCnt * 100);
 
         await sleep(1);
@@ -71,29 +70,33 @@ const cultureLandCharge = async (driver, money, id, pw) => {
 
         await last_handle(driver);
 
-        await finallyPaymentCheck(driver);
+        await finallyPaymentCheck(driver, insertedId, money);
+
+        await driver.quit();
 
     } catch (e) {
         console.log(e)
     }
 }
 
-const run = async () => {
+const cultureLandCharger = async (afreecaId, afreecaPw, cultureId, culturePw, ChargePrice, insertedId) => {
   const driver = await createDriver();
   try {
-    await afreeca_login(driver, 'chlvuddks', 'a25986633!');
-    const isLogin = await is_login(driver);
-    if (!isLogin) {
-        console.log('로그인 실패')
-    } else {
-        await buy_btn(driver);
-        await popup_handle(driver);
-        await cultureLandCharge(driver, 3000,'chlvuddks1','a58598295!');
-    }
+        console.log('컬쳐 로그인 시작');
+        await afreeca_login(driver, afreecaId, afreecaPw);
+        const isLogin = await is_login(driver);
+        if (!isLogin) {
+            await mysqlWrite.query(`UPDATE charged_star_ballon SET success = 0, failed_price = ${ChargePrice}, log = "아프리카 로그인 실패" WHERE id = ${insertedId}`);
+            await driver.quit();
+        } else {
+            await buy_btn(driver);
+            await popup_handle(driver);
+            await cultureLandCharge(driver, ChargePrice, cultureId, culturePw, insertedId);
+        }
   } catch (e) {
       console.log(e);
     // await driver.quit();
   }
 };
 
-run();
+export { cultureLandCharger };

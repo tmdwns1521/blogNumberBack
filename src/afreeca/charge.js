@@ -1,4 +1,5 @@
 import { sleep, By } from './selenium.js';
+import { mysqlWrite, mysqlRead } from '../config/database.js';
 
 // 구매 상품 누르기
 const buy_btn = async (driver) => {
@@ -8,12 +9,24 @@ const buy_btn = async (driver) => {
        await sleep(2);
 
        const btnBuy = await driver.findElements(By.className('btn_buy'));
-       btnBuy[0].click();
+       btnBuy[1].click();
 
        await sleep(2);
 
     } catch (e) {
-        console.log(e);
+        console.log('buy_btn', e)
+    }
+}
+
+// 별풍선 쿠폰 충전
+const coupon_buy = async (driver) => {
+    try {
+       driver.get('https://item.afreecatv.com/starballoon.php');
+
+       await sleep(2);
+
+    } catch (e) {
+        console.log('coupon_buy', e)
     }
 }
 
@@ -33,8 +46,9 @@ const last_handle = async (driver) => {
 
 
         await sleep(2)
+
     } catch (e) {
-        console.log(e);
+        console.log('last_handle', e)
     }
 }
 
@@ -44,11 +58,14 @@ const popup_handle = async (driver) => {
 
         await last_handle(driver);
 
-        await sleep(2);
-
-        await adClear(driver);
+        await sleep(1.5);
+        try {
+            await adClear(driver);
+        } catch (e) {
+            // pass
+        }
     } catch (e) {
-        console.log(e);
+        console.log('popup_handle', e)
     }
 }
 
@@ -60,19 +77,30 @@ const adClear = async (driver) => {
         await driver.executeScript('arguments[0].click();', bg);
 
         await sleep(1);
+
     } catch (e) {
-        console.log(e);
+        // console.log("adClear", e);
     }
 }
 
-// 결제 완료 체크박스 클릭
-const checkBoxOn = async (driver) => {
+const scrollDown = async (driver) => {
     try {
         await sleep(1);
 
         await driver.executeScript('window.scrollTo(0, document.body.scrollHeight);');
 
         await sleep(1);
+
+    } catch (e) {
+        console.log("scrollDown", e);
+    }
+}
+
+// 결제 완료 체크박스 클릭
+const checkBoxOn = async (driver) => {
+    try {
+
+        await scrollDown(driver);
 
         const paycont = driver.findElement(By.id('paycont'));
         const paycont1 = driver.findElement(By.id('paycont1'));
@@ -84,11 +112,13 @@ const checkBoxOn = async (driver) => {
         paycont1.click();
 
         await sleep(1);
+
     } catch (e) {
-        console.log(e);
+        console.log("checkBoxOn", e);
     }
 }
 
+// 결제하기 클릭
 const payment = async (driver) => {
     try {
 
@@ -98,11 +128,13 @@ const payment = async (driver) => {
         await paymentBtn.click();
 
         await sleep(1);
-    } catch(e) {
 
+    } catch(e) {
+        console.log("payment", e);
     }
 }
 
+// 최종 결제 누르기
 const paymentCheck = async (driver) => {
     try {
 
@@ -111,34 +143,55 @@ const paymentCheck = async (driver) => {
         const payCheck = await driver.findElements(By.tagName('img'));
         for (const pc of payCheck) {
             const popupbtnOk = await pc.getAttribute('src');
-            if (popupbtnOk.indexOf('popupbtn_ok')) {
+            if (popupbtnOk.indexOf('popupbtn_ok') !== -1) {
                 pc.click();
                 break;
             }
         }
 
-        await sleep(1);
+        await sleep(2);
+
+        console.log('최종결제');
     } catch (e) {
-        console.log(e);
+        console.log("paymentCheck", e);
     }
 }
 
-const finallyPaymentCheck = async (driver) => {
+const finallyPaymentCheck = async (driver, insertedId, price) => {
     try {
         await sleep(1);
 
-        const result = driver.driver.getPageSource();
-        if (result.indexOf('아이템 구매가 완료되었습니다.') !== -1) {
-            console.log('에러발생');
-        } else {
+        try {
+            const alert = await driver.switchTo().alert()
+            await alert.accept(); // 알림창 확인
+            await mysqlWrite.query(`UPDATE charged_star_ballon SET success = 0, failed_price = ${price}, log = "금액이 부족합니다." WHERE id = ${insertedId}`)
+            return
+        } catch (error) {
+            // 알림창 처리 실패 시 예외 처리
+            // console.log('알림창 처리 실패:', error);
+        }
+
+
+        const result = await driver.getPageSource();
+        if (result.indexOf('완료') !== -1) {
             console.log('정상 구매 확인');
+            await mysqlWrite.query(`UPDATE charged_star_ballon SET success = 1, complete_chared_price = ${price} WHERE id = ${insertedId}`)
+        } else if (result.indexOf('부족') !== -1) {
+            const lack = await driver.findElement(By.className('caution'))
+            const lack_comment = await lack.getText();
+            await mysqlWrite.query(`UPDATE charged_star_ballon SET success = 0, failed_price = ${price}, log = "${lack_comment}" WHERE id = ${insertedId}`)
+        } else {
+            let error_coment = await driver.findElement(By.className('cell-white'))
+            error_coment = await error_coment.getText()
+            await mysqlWrite.query(`UPDATE charged_star_ballon SET success = 0, failed_price = ${price}, log = "${error_coment}" WHERE id = ${insertedId}`)
         }
 
         await sleep(1);
     } catch (e) {
-
+        console.log("finallyPaymentCheck", e);
     }
 }
+
 
 export {
     buy_btn,
@@ -148,5 +201,7 @@ export {
     payment,
     paymentCheck,
     last_handle,
-    finallyPaymentCheck
+    scrollDown,
+    finallyPaymentCheck,
+    coupon_buy
 }

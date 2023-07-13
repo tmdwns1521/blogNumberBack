@@ -1,10 +1,8 @@
 import cors from 'cors';
 import express from 'express';
 import {
-	viewsRouter,
-	consultingRouter,
+	charge,
 	userRouter,
-	visitorRouter
 } from './routers/index.js';
 const app = express();
 
@@ -20,8 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 // html, css, js 라우팅
 // app.use(viewsRouter);
 
-app.use('/api', consultingRouter);
+app.use('/charge', charge);
 app.use('/api', userRouter);
-app.use('/api', visitorRouter);
 
 export { app };
