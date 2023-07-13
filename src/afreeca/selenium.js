@@ -18,7 +18,8 @@ export const createDriver = async () => {
       new chrome.Options()
         .headless()
         .addArguments('--disable-gpu', 'lang=ko_KR')
-    ).build();
+    ).setChromeService(new chrome.ServiceBuilder('chromedriver'))
+    .build();
 
   return driver;
 };
