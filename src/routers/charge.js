@@ -35,6 +35,7 @@ charge.post('/serialRegist', async function (req, res, next) {
 charge.post('/AfreecaCharge', async function (req, res, next) {
 	try {
 		let { card, afId, afPw, Id, Pw, price } = req.body;
+		console.log(req.body);
 		if (afId === '' || afPw === '' || price === '') return false;
 		let result;
 		price = price.replaceAll(',', '');
