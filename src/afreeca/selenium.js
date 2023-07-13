@@ -17,7 +17,7 @@ export const createDriver = async () => {
     .setChromeOptions(
       new chrome.Options()
         .headless()
-        .addArguments('--disable-gpu', 'lang=ko_KR')
+        .addArguments('--disable-dev-shm-usage', '--no-sandbox', 'lang=ko_KR')
     ).setChromeService(new chrome.ServiceBuilder('chromedriver'))
     .build();
 
