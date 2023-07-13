@@ -14,8 +14,12 @@ export const createDriver = async () => {
 
   const driver = await new Builder()
     .forBrowser('chrome')
-    .setChromeOptions(new chrome.Options().headless().addArguments("--disable-gpu",
-          "lang=ko_KR"))
+    .setChromeOptions(
+      new chrome.Options()
+        .headless()
+        .addArguments('--disable-gpu', 'lang=ko_KR')
+    )
+    .setChromeService(new chrome.ServiceBuilder('./src/afreeca/chromedriver'))
     .build();
 
   return driver;
