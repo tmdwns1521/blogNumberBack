@@ -88,11 +88,13 @@ export class Charge {
 		}
 	}
 
-	async serialRegist(serialNum, serialPrice, serialPassword) {
+	async serialRegist(chargePrice, couponDatas) {
 		try {
-			serialPrice = Number(serialPrice.replaceAll(',', ''));
-			const result = await mysqlWrite.query(`INSERT INTO afreecaCoupon (serialNumber, price, password) VALUES ('${serialNum}', ${serialPrice}, '${serialPassword}')`);
-			return result[0].insertId;
+			for (const e of couponDatas) {
+				const serialNumber = e.split('(비번)')[0];
+				const password = e.split('(비번)')[1];
+				await mysqlWrite.query(`INSERT INTO afreecaCoupon (serialNumber, price, password) VALUES ('${serialNumber}', ${chargePrice}, '${password}')`);
+			}
 		} catch (e) {
 			console.log(e);
 		}

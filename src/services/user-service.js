@@ -1,8 +1,9 @@
-import { userModel } from '../db/index.js';
+import {userModel} from '../db/index.js';
 
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
 
 class UserService {
 	// 본 파일의 맨 아래에서, new UserService(userModel) 하면, 이 함수의 인자로 전달됨
@@ -15,13 +16,13 @@ class UserService {
 		// 객체 destructuring
 		const { email, fullName, password, provider } = userInfo;
 
-		// 이메일 중복 확인
-		const user = await this.userModel.findByEmail(email);
-		if (user) {
-			throw new Error(
-				'이 이메일은 현재 사용중입니다. 다른 이메일을 입력해 주세요.',
-			);
-		}
+		// // 이메일 중복 확인
+		// const user = await this.userModel.findByEmail(email);
+		// if (user) {
+		// 	throw new Error(
+		// 		'이 이메일은 현재 사용중입니다. 다른 이메일을 입력해 주세요.',
+		// 	);
+		// }
 
 		// 이메일 중복은 이제 아니므로, 회원가입을 진행함
 
@@ -29,20 +30,19 @@ class UserService {
 		const hashedPassword = await bcrypt.hash(password, 10);
 
 		const newUserInfo = { fullName, email, password: hashedPassword, provider };
+		console.log(newUserInfo)
 
 		// db에 저장
-		const createdNewUser = await this.userModel.create(newUserInfo);
-
-		return createdNewUser;
+		// return this.userModel.create(newUserInfo);
 	}
 
 	// 로그인
 	async getUserToken(loginInfo) {
 		// 객체 destructuring
-		const { email, password } = loginInfo;
+		const { id, password } = loginInfo;
 
 		// 우선 해당 이메일의 사용자 정보가  db에 존재하는지 확인
-		const user = await this.userModel.findByEmail(email);
+		const user = await this.userModel.findByEmail(id);
 		if (!user) {
 			return { "status": 400, "result": "해당 아이디는 가입 내역이 없습니다. 다시 한 번 확인해 주세요." };
 		}
@@ -50,7 +50,7 @@ class UserService {
 		// 이제 이메일은 문제 없는 경우이므로, 비밀번호를 확인함
 
 		// 비밀번호 일치 여부 확인
-		const correctPasswordHash = user.password; // db에 저장되어 있는 암호화된 비밀번호
+		const correctPasswordHash = user[0].password; // db에 저장되어 있는 암호화된 비밀번호
 
 		// 매개변수의 순서 중요 (1번째는 프론트가 보내온 비밀번호, 2번쨰는 db에 있떤 암호화된 비밀번호)
 		const isPasswordCorrect = await bcrypt.compare(
@@ -63,7 +63,8 @@ class UserService {
 		}
 
 		// 로그인 성공 -> JWT 웹 토큰 생성
-		const secretKey = process.env.JWT_SECRET_KEY || 'secret-key';
+		const secretKey = process.env.JWT_SECRET_KEY;
+		console.log(secretKey);
 
 		// 2개 프로퍼티를 jwt 토큰에 담음
 		const token = jwt.sign({ userId: user._id, role: user.role }, secretKey);

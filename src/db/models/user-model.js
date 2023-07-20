@@ -1,13 +1,15 @@
 import pkg from 'mongoose';
+import {UserSchema} from '../schemas/user-schema.js';
+import {mysqlRead, mysqlWrite} from '../../config/database.js';
+
 const { model } = pkg;
-import { UserSchema } from '../schemas/user-schema.js';
 
 const User = model('users', UserSchema);
 
 export class UserModel {
 	async findByEmail(email) {
-		const user = await User.findOne({ email });
-		return user;
+		const user = await mysqlRead.query('SELECT * FROM user WHERE email = ?', [email]);
+		return user[0];
 	}
 
 	async findById(userId) {
@@ -16,8 +18,9 @@ export class UserModel {
 	}
 
 	async create(userInfo) {
-		const createdNewUser = await User.create(userInfo);
-		return createdNewUser;
+		const { email, fullName, password, provider } = userInfo;
+		const result = await mysqlWrite.query('')
+		return await User.create(userInfo);
 	}
 
 	async findAll() {

@@ -22,9 +22,9 @@ charge.get('/chargeOnAir', async function (req, res, next) {
 });
 charge.post('/serialRegist', async function (req, res, next) {
 	try {
-		const { serialNum, serialPrice, serialPassword } = req.body;
-		if (serialNum !== null && serialPrice !== null && serialPassword) {
-			const result = await chargeService.serialRegist(serialNum, serialPrice, serialPassword);
+		const { chargePrice, couponDatas } = req.body;
+		if (chargePrice !== null && couponDatas !== null) {
+			const result = await chargeService.serialRegist(chargePrice, couponDatas);
 			res.status(200).json(result);
 		}
 	} catch (error) {

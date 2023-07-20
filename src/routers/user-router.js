@@ -2,6 +2,11 @@ import { Router } from 'express';
 import { userService } from '../services/index.js';
 import bcrypt from 'bcrypt';
 import mysql from 'mysql2/promise';
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 const userRouter = Router();
 
@@ -40,10 +45,8 @@ userRouter.get('/getCattleShed', async (req, res, next) => {
 // 새로운 가축
 userRouter.post('/createNew', async function (req, res, next) {
 	try {
-		const { entity_identification_number, gender, parent_entity_identification_number, birth, report_date, modification_date, appraise, delivery_day } = req.body;
-		const sql = "insert into new_table (entity_identification_number, gender, parent_entity_identification_number, birth, report_date, modification_date, appraise, delivery_day) values ?"
-		const data = await mysqlWrite.query(sql, [[[entity_identification_number, gender, parent_entity_identification_number, birth, report_date, modification_date, appraise, delivery_day]]])
-		res.status(200).json(data);
+		const result = await userService.addUser(req.body);
+		res.status(200).json(result);
 	} catch (error) {
 		next(error);
 	}
@@ -57,6 +60,24 @@ userRouter.post('/updateNew', async function (req, res, next) {
 		const sql = "update new_table set entity_identification_number = ?, gender = ?, parent_entity_identification_number = ?, birth = ?, report_date = ?, modification_date = ?, appraise = ?, delivery_day = ? where id = ?"
 		const data = await mysqlWrite.query(sql, [entity_identification_number, gender, parent_entity_identification_number, birth, report_date, modification_date, appraise, delivery_day, id])
 		res.status(200).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
+// 로그인 api (아래는 /login 이지만, 실제로는 /api/login로 요청해야 함.)
+userRouter.post('/login', async function (req, res, next) {
+	try {
+
+		// req (request) 에서 데이터 가져오기
+		const { id, password } = req.body;
+		console.log(id, password)
+
+		// 로그인 진행 (로그인 성공 시 jwt 토큰을 프론트에 보내 줌)
+		const userToken = await userService.getUserToken({ id, password });
+
+		// jwt 토큰을 프론트에 보냄 (jwt 토큰은, 문자열임)
+		res.status(200).json(userToken);
 	} catch (error) {
 		next(error);
 	}
@@ -169,6 +190,25 @@ userRouter.delete('/delete', async function (req, res, next) {
 	} catch (error) {
 		next(error);
 	}
+});
+
+userRouter.post('/verify-token', (req, res) => {
+	const token = req.headers.authorization?.split(' ')[1]; // Authorization 헤더에서 토큰 추출
+	if (!token) {
+		return res.status(401).json({ error: 'Token not provided' });
+	}
+
+	const secretKey = process.env.JWT_SECRET_KEY;
+
+	// Verify token
+	jwt.verify(token, secretKey, (err, decoded) => {
+		if (err) {
+		  return res.json({ isValid: false });
+		}
+
+		// Token is valid, return success
+		res.json({ isValid: true });
+  });
 });
 
 userRouter.get('/isadmin', async (req, res, next) => {

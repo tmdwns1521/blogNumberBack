@@ -1,5 +1,6 @@
 import {ChargeModel} from '../db/index.js';
 
+
 class Charge {
 	// 본 파일의 맨 아래에서, new UserService(userModel) 하면, 이 함수의 인자로 전달됨
 	constructor(ChargeModel) {
@@ -19,8 +20,8 @@ class Charge {
 		return await this.ChargeModel.HappyMoneyCharge(afId, afPw, Id, Pw, price);
 	}
 
-	async serialRegist(serialNum, serialPrice, serialPassword){
-		return await this.ChargeModel.serialRegist(serialNum, serialPrice, serialPassword);
+	async serialRegist(chargePrice, couponDatas){
+		return await this.ChargeModel.serialRegist(chargePrice, couponDatas);
 	}
 
 	async chargeOnAir(){
