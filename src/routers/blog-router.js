@@ -61,7 +61,9 @@ blogRouter.get('/getNumberBlogs', async (req, res, next) => {
 // 번호 엑셀 추출
 
 blogRouter.get('/download-text', async (req, res) => {
+	console.log('다운로드 시작1');
 	const data = await blogService.getNumberBlogsText();
+	console.log('다운로드 시작2');
 	let textData = '';
 
 	data.NumberBlogs.forEach((e) => {

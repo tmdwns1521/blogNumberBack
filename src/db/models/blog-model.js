@@ -5,7 +5,7 @@ export class BlogModel {
 	async getBlogs() {
 		// const blogs = await mysqlRead.query('SELECT COUNT(*) FROM check_blog');
 		const [ blogs, checkBlogs, checkBLogsOn, OptimizationBlogs, OptimizationBlogsOn, UsedBlogs, UsedBlogsOn] = await Promise.all([
-			mysqlRead.query('SELECT COUNT(*) FROM check_blog'),
+			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_marketing = 0'),
 			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check <> 0 AND is_marketing = 0'),
 			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check = 1 AND is_marketing = 0'),
 			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization <> 0 AND is_marketing = 0'),
@@ -77,7 +77,7 @@ export class BlogModel {
 	async getNumberBlogsText() {
 		const NumberBlogs = await mysqlRead.query('SELECT * FROM check_blog WHERE is_used = 1 AND is_marketing = 0');
 		const NumberIds = NumberBlogs[0].map((e) => e.id).join(',');
-		const UPdateBlogs = await mysqlWrite.query(`UPDATE check_blog SET is_marketing = 2 WHERE id IN (${NumberIds})`);
+		mysqlWrite.query(`UPDATE check_blog SET is_marketing = 2 WHERE id IN (${NumberIds})`);
 		return {"NumberBlogs": NumberBlogs[0] };
 	}
 
