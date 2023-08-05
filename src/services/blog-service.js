@@ -52,6 +52,14 @@ class BlogService {
 		}
 	}
 
+	async getNumberBlogsText(){
+		try {
+			return await this.blogModel.getNumberBlogsText()
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
 
 
 

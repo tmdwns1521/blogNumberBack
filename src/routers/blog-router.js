@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { blogService } from '../services/index.js';
 import dotenv from 'dotenv';
+import ExcelJS from 'exceljs';
+import fs from 'fs';
+
 dotenv.config();
 
 const blogRouter = Router();
@@ -55,16 +58,21 @@ blogRouter.get('/getNumberBlogs', async (req, res, next) => {
 	}
 });
 
-// 새로운 가축
-blogRouter.post('/createNew', async function (req, res, next) {
-	try {
-		const result = await userService.addUser(req.body);
-		res.status(200).json(result);
-	} catch (error) {
-		next(error);
-	}
+// 번호 엑셀 추출
+
+blogRouter.get('/download-text', async (req, res) => {
+	const data = await blogService.getNumberBlogsText();
+	let textData = '';
+
+	data.NumberBlogs.forEach((e) => {
+		textData += `${e.blog_id}\t${e.number}\n`
+	})
+	// 다운로드 링크 제공
+	res.set({
+		'Content-Disposition': 'attachment; filename="example.txt"',
+		'Content-Type': 'text/plain',
+	});
+	res.send(textData);
 });
-
-
 
 export { blogRouter };

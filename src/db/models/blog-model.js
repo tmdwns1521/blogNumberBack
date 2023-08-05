@@ -6,12 +6,12 @@ export class BlogModel {
 		// const blogs = await mysqlRead.query('SELECT COUNT(*) FROM check_blog');
 		const [ blogs, checkBlogs, checkBLogsOn, OptimizationBlogs, OptimizationBlogsOn, UsedBlogs, UsedBlogsOn] = await Promise.all([
 			mysqlRead.query('SELECT COUNT(*) FROM check_blog'),
-			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check <> 0 AND is_marketing != 1'),
-			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check = 1 AND is_marketing != 1'),
-			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization <> 0 AND is_marketing != 1'),
-		  	mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization = 1 AND is_marketing != 1'),
-			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used <> 0 AND is_marketing != 1'),
-		  	mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used = 1 AND is_marketing != 1')
+			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check <> 0 AND is_marketing = 0'),
+			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check = 1 AND is_marketing = 0'),
+			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization <> 0 AND is_marketing = 0'),
+		  	mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization = 1 AND is_marketing = 0'),
+			mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used <> 0 AND is_marketing = 0'),
+		  	mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used = 1 AND is_marketing = 0')
 		]);
 		const blogsCount = blogs[0][0]['COUNT(*)'];
 		const checkBlogsCount = checkBlogs[0][0]['COUNT(*)'];
@@ -34,8 +34,8 @@ export class BlogModel {
 
 	async getCheckBlogs() {
 		const [checkBlogs, checkBLogsOn] = await Promise.all([
-		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check <> 0 AND is_marketing != 1'),
-		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check = 1 AND is_marketing != 1')
+		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check <> 0 AND is_marketing = 0'),
+		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check = 1 AND is_marketing = 0')
 		]);
 
 		const checkBlogsCount = checkBlogs[0][0]['COUNT(*)'];
@@ -46,8 +46,8 @@ export class BlogModel {
 
 	async getOptimizationBlogs() {
 		const [OptimizationBlogs, OptimizationBlogsOn] = await Promise.all([
-		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization <> 0 AND is_marketing != 1'),
-		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization = 1 AND is_marketing != 1')
+		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization <> 0 AND is_marketing = 0'),
+		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization = 1 AND is_marketing = 0')
 		]);
 
 		const OptimizationBlogsCount = OptimizationBlogs[0][0]['COUNT(*)'];
@@ -58,8 +58,8 @@ export class BlogModel {
 
 	async getUsedBlogs() {
 		const [UsedBlogs, UsedBlogsOn] = await Promise.all([
-		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used <> 0 AND is_marketing != 1'),
-		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used = 1 AND is_marketing != 1')
+		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used <> 0 AND is_marketing = 0'),
+		  mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_used = 1 AND is_marketing = 0')
 		]);
 
 		const UsedBlogsCount = UsedBlogs[0][0]['COUNT(*)'];
@@ -69,8 +69,15 @@ export class BlogModel {
 	}
 
 	async getNumberBlogs() {
-		const NumberBlogs = await mysqlRead.query('SELECT * FROM check_blog WHERE is_used = 1 AND is_marketing != 1');
+		const NumberBlogs = await mysqlRead.query('SELECT * FROM check_blog WHERE is_used = 1 AND is_marketing = 0');
 
+		return {"NumberBlogs": NumberBlogs[0] };
+	}
+
+	async getNumberBlogsText() {
+		const NumberBlogs = await mysqlRead.query('SELECT * FROM check_blog WHERE is_used = 1 AND is_marketing = 0');
+		const NumberIds = NumberBlogs[0].map((e) => e.id).join(',');
+		const UPdateBlogs = await mysqlWrite.query(`UPDATE check_blog SET is_marketing = 2 WHERE id IN (${NumberIds})`);
 		return {"NumberBlogs": NumberBlogs[0] };
 	}
 
