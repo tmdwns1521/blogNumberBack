@@ -3,12 +3,20 @@ import {userModel} from '../db/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 class UserService {
 	// 본 파일의 맨 아래에서, new UserService(userModel) 하면, 이 함수의 인자로 전달됨
 	constructor(userModel) {
 		this.userModel = userModel;
+	}
+
+	async userState(id) {
+		return await this.userModel.userState(id)
+	}
+	async userStatus() {
+		return await this.userModel.userStatus()
 	}
 
 	// 회원가입

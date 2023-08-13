@@ -6,6 +6,20 @@ import {
 } from './routers/index.js';
 const app = express();
 
+import cron from 'node-cron';
+import migrateData from '../src/utils/migration.js'; // 마이그레이션 함수가 있는 파일 경로로 변경해야 합니다.
+
+// '0 12 * * *'은 매일 12시 0분에 실행됨을 의미합니다.
+cron.schedule('0 12 * * *', async () => {
+    try {
+        console.log('Starting data migration...');
+        await migrateData();
+        console.log('Data migration completed.');
+    } catch (error) {
+        console.error('Error during scheduled migration:', error);
+    }
+});
+
 // CORS 에러 방지
 app.use(cors());
 
@@ -18,6 +32,6 @@ app.use(express.urlencoded({ extended: false }));
 // html, css, js 라우팅
 // app.use(viewsRouter);
 app.use('/blog', blogRouter);
-app.use('/api', userRouter);
+app.use('/user', userRouter);
 
 export { app };

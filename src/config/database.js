@@ -21,4 +21,25 @@ const mysqlRead = mysql.createPool({
 	connectionLimit: 180 //default 10
 });
 
-export { mysqlWrite, mysqlRead };
+const mysqlWriteServer = mysql.createPool({
+	host: 'blogdbserver.sldb.iwinv.net',
+	user: 'root',
+	password: 'iv3cx8V4T1YH',
+	database: 'Optimization_analysis',
+	dateStrings: true,
+	multipleStatements: true,
+	connectTimeout: 5000,
+	connectionLimit: 180 //default 10
+});
+
+const mysqlReadServer = mysql.createPool({
+	host: 'blogdbserver.sldb.iwinv.net',
+	user: 'root',
+	password: 'iv3cx8V4T1YH',
+	database: 'Optimization_analysis',
+	dateStrings: true,
+	connectTimeout: 5000,
+	connectionLimit: 180 //default 10
+});
+
+export { mysqlWrite, mysqlRead, mysqlWriteServer, mysqlReadServer };

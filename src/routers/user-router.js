@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userService } from '../services/index.js';
+import {userService} from '../services/index.js';
 import bcrypt from 'bcrypt';
 import mysql from 'mysql2/promise';
 import jwt from "jsonwebtoken";
@@ -11,16 +11,24 @@ dotenv.config();
 const userRouter = Router();
 //
 //
-// // 회원가입 api (아래는 /register이지만, 실제로는 /api/register로 요청해야 함.)
-// userRouter.get('/getCattleShed', async (req, res, next) => {
-// 	try {
-// 		const sql = 'select * from new_table'
-// 		const data = await mysqlRead.query(sql)
-// 		res.status(201).json(data[0]);
-// 	} catch (error) {
-// 		next(error);
-// 	}
-// });
+// 회원가입 api (아래는 /register이지만, 실제로는 /api/register로 요청해야 함.)
+userRouter.get('/userStatus', async (req, res, next) => {
+	try {
+		const data = await userService.userStatus();
+		res.status(201).json(data[0]);
+	} catch (error) {
+		next(error);
+	}
+});
+
+userRouter.post('/userState', async (req, res, next) => {
+	try {
+		const data = await userService.userState(req.body.id);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
 //
 // // 새로운 가축
 // userRouter.post('/createNew', async function (req, res, next) {
