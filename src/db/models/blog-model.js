@@ -76,53 +76,10 @@ export class BlogModel {
 	}
 
 	async getNumberBlogsText() {
-		const NumberBlogs = await mysqlRead.query('SELECT * FROM check_blog WHERE is_used = 1 AND is_marketing = 0');
+		const NumberBlogs = await mysqlReadServer.query('SELECT * FROM check_blog WHERE is_used = 1 AND is_marketing = 0');
 		const NumberIds = NumberBlogs[0].map((e) => e.id).join(',');
-		mysqlWrite.query(`UPDATE check_blog SET is_marketing = 2 WHERE id IN (${NumberIds})`);
+		mysqlWriteServer.query(`UPDATE check_blog SET is_marketing = 2 WHERE id IN (${NumberIds})`);
 		return {"NumberBlogs": NumberBlogs[0] };
-	}
-
-
-
-
-
-
-
-	async findById(userId) {
-		const user = await User.findOne({ _id: userId });
-		return user;
-	}
-
-	async create(userInfo) {
-		const { email, fullName, password, provider } = userInfo;
-		const result = await mysqlWrite.query('')
-		return await User.create(userInfo);
-	}
-
-	async findAll() {
-		const users = await User.find({});
-		return users;
-	}
-
-	async update({ userId, update }) {
-		const filter = { _id: userId };
-		const option = { returnOriginal: false };
-
-		const updatedUser = await User.findOneAndUpdate(filter, update, option);
-		return updatedUser;
-	}
-
-	async updateByEmail({ email, update }) {
-		const filter = { email };
-		const option = { returnOriginal: false };
-
-		const updatedUser = await User.findOneAndUpdate(filter, update, option);
-		return updatedUser;
-	}
-
-	async delete(userId) {
-		await User.deleteOne({ _id: userId });
-		return;
 	}
 }
 

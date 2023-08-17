@@ -67,7 +67,7 @@ blogRouter.get('/download-text', async (req, res) => {
 	let textData = '';
 
 	data.NumberBlogs.forEach((e) => {
-		textData += `${e.blog_id}\t${e.number}\n`
+		textData += `${e.blog_id}\t${e.number}\t${e.logic}\n`
 	})
 	// 다운로드 링크 제공
 	res.set({
