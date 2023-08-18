@@ -77,4 +77,22 @@ blogRouter.get('/download-text', async (req, res) => {
 	res.send(textData);
 });
 
+blogRouter.post('/blogRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.blogRankData(req.body);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogRouter.get('/getBlogRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.getBlogRankData();
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
 export { blogRouter };

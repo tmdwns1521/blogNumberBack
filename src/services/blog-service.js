@@ -12,11 +12,30 @@ class BlogService {
 		this.blogModel = blogModel;
 	}
 
+	async getBlogRankData() {
+		try {
+			return await this.blogModel.getBlogRankData()
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+	async blogRankData(req) {
+		try {
+			return await this.blogModel.blogRankData(req)
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 	async getBlogs() {
 		try {
 			return await this.blogModel.getBlogs()
 		} catch (e) {
 			console.log(e);
+			return e;
 		}
 	}
 
@@ -25,6 +44,7 @@ class BlogService {
 			return await this.blogModel.getCheckBlogs()
 		} catch (e) {
 			console.log(e);
+			return e;
 		}
 	}
 
@@ -33,6 +53,7 @@ class BlogService {
 			return await this.blogModel.getOptimizationBlogs()
 		} catch (e) {
 			console.log(e);
+			return e;
 		}
 	}
 
@@ -41,6 +62,7 @@ class BlogService {
 			return await this.blogModel.getUsedBlogs()
 		} catch (e) {
 			console.log(e);
+			return e;
 		}
 	}
 
