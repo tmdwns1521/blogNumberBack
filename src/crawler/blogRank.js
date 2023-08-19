@@ -62,17 +62,45 @@ async function blogViewCrawler(item) {
     }
 }
 async function smartBlock(data) {
-    console.log('aa');
+    const my_url = data.blog_url.split(',').pop();
+    let pageSource = await axios.get(data.smartlink);
+    let ranking = 99
+    pageSource = pageSource.data;
+    pageSource = pageSource.split('title_area');
+    pageSource = pageSource.map((item) => item.split('onclick')[0].split('href=')[1].split('"')[1]);
+    pageSource = pageSource.filter(item => item !== '#');
+    const rank = pageSource.indexOf(my_url);
+    if (rank > 0) {
+        ranking = rank;
+    }
+    await mysqlWriteServer.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${data.id}`);
+    const now = new Date();
+    const year = now.getFullYear();  // 연도 (e.g., 2023)
+    const month = now.getMonth() + 1;  // 월 (0부터 시작하므로 1을 더해줌)
+    const day = now.getDate();  // 일
+
+    const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+    const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, data.id);
+    if (SelectRankingQuery[0].length > 0) {
+        const gap = SelectRankingQuery[0][0].rank - ranking;
+        const RankingQuery = 'UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ?'
+        await mysqlWriteServer.query(RankingQuery, [ranking, gap, now, data.id]);
+    } else {
+        const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
+        await mysqlWriteServer.query(RankingQuery, [data.id, ranking, now]);
+    }
 }
 async function blogrankCrawler(data) {
     for (const item of data) {
         console.log(item.blog_url.split(',').pop())
         if (item.type === 0 && item.blog_url.split(',').pop() !== '') {
             // console.log(item);
-            blogViewCrawler(item);
-            await delay(2);
-        } else if (item.type === 1 && item.blog_url.split(',').pop() !== '') {
+            // blogViewCrawler(item);
+            // await delay(2);
+        } else if (item.type === 1 && item.blog_url.split(',').pop() !== '' && item.smartlink) {
             smartBlock(item)
+            // break
         }
     }
 }
