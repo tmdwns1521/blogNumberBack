@@ -94,10 +94,10 @@ export class BlogModel {
 
 	async blogRankData(req) {
 		try {
-			let { blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales } = req
+			let { blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail } = req
 			sales = sales.replaceAll(',', '');
-			const query = `INSERT INTO blogRankManagement (blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-			const rs = await mysqlWriteServer.query(query, [blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales]);
+			const query = `INSERT INTO blogRankManagement (blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+			const rs = await mysqlWriteServer.query(query, [blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail]);
 			return rs[0];
 		} catch (e) {
 			console.log(e);
