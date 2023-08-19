@@ -54,7 +54,7 @@ export async function blogViewCrawler(item) {
     const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
     if (SelectRankingQuery[0].length > 0) {
         const gap = SelectRankingQuery[0][0].rank - ranking;
-        const RankingQuery = 'UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ?'
+        const RankingQuery = "UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'"
         await mysqlWriteServer.query(RankingQuery, [ranking, gap, now, item.id]);
     } else {
         const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
@@ -84,7 +84,7 @@ export async function smartBlock(data) {
     const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, data.id);
     if (SelectRankingQuery[0].length > 0) {
         const gap = SelectRankingQuery[0][0].rank - ranking;
-        const RankingQuery = 'UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ?'
+        const RankingQuery = 'UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\''
         await mysqlWriteServer.query(RankingQuery, [ranking, gap, now, data.id]);
     } else {
         const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
@@ -93,7 +93,6 @@ export async function smartBlock(data) {
 }
 export async function blogrankCrawler(data) {
     for (const item of data) {
-        console.log(item.blog_url.split(',').pop())
         if (item.type === 0 && item.blog_url.split(',').pop() !== '') {
             // console.log(item);
             blogViewCrawler(item);
