@@ -24,6 +24,7 @@ cron.schedule('0 12 * * *', async () => {
 cron.schedule('*/10 * * * *', async () => {
     try {
         console.log('Starting data blogCrawler...');
+        console.log(new Date());
         await OnblogRank();
         console.log('Data blogCrawler completed.');
     } catch (error) {

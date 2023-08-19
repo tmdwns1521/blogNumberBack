@@ -5,6 +5,7 @@ import {mysqlWriteServer, mysqlReadServer} from '../config/database.js';
 export async function blogRankData() {
     const blogRankQuery = 'SELECT * FROM blogRankManagement';
     const rs = await mysqlReadServer.query(blogRankQuery);
+    console.log(rs[0]);
     return rs[0]
 }
 
