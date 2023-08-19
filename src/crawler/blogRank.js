@@ -40,6 +40,7 @@ export async function blogViewCrawler(item) {
             }
             await delay(2);
         } catch (e) {
+            console.log(e);
             break;
         }
 
