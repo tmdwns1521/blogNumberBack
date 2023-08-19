@@ -107,9 +107,21 @@ export class BlogModel {
 
 	async getBlogRankData() {
 		try {
-			const rs = await mysqlReadServer.query(`SELECT * FROM blogRankManagement` );
+			const now = new Date();
+			const year = now.getFullYear();  // 연도 (e.g., 2023)
+			const month = now.getMonth() + 1;  // 월 (0부터 시작하므로 1을 더해줌)
+			const day = now.getDate();  // 일
 
-			return rs[0];
+			const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+			const rs = await mysqlReadServer.query(`SELECT * FROM blogRankManagement` );
+			let ids = rs[0].map(item => item.id);
+			ids = ids.join(',');
+			const blog_ranks = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id IN (${ids})` );
+			rs[0].forEach((item) => {
+				const blog_filter = blog_ranks[0].filter(e => e.blog_id === item.id && e.rank <= 5 && e.rank > 0 && String(e.updatedAt).includes(formattedDate) === false);
+				item.count = blog_filter.length;
+			})
+			return {blogs: rs[0], blog_ranks : blog_ranks[0]};
 		} catch (e) {
 			console.log(e);
 			return e;
