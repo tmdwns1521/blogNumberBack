@@ -107,7 +107,10 @@ export class BlogModel {
 
 	async getBlogRankData() {
 		try {
-			const rs = await mysqlReadServer.query('SELECT * FROM blogRankManagement');
+			const rs = await mysqlReadServer.query(`SELECT bm.*, br.gap, br.blog_id, br.updatedAt FROM blogRankManagement bm
+																					LEFT JOIN blogRankRecord br
+																						ON bm.id = br.blog_id` );
+
 			return rs[0];
 		} catch (e) {
 			console.log(e);

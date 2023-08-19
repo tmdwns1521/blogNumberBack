@@ -8,6 +8,7 @@ const app = express();
 
 import cron from 'node-cron';
 import migrateData from '../src/utils/migration.js'; // 마이그레이션 함수가 있는 파일 경로로 변경해야 합니다.
+import { OnblogRank } from './crawler/blogRank.js';
 
 // '0 12 * * *'은 매일 12시 0분에 실행됨을 의미합니다.
 cron.schedule('0 12 * * *', async () => {
@@ -15,6 +16,16 @@ cron.schedule('0 12 * * *', async () => {
         console.log('Starting data migration...');
         await migrateData();
         console.log('Data migration completed.');
+    } catch (error) {
+        console.error('Error during scheduled migration:', error);
+    }
+});
+
+cron.schedule('*/10 * * * *', async () => {
+    try {
+        console.log('Starting data blogCrawler...');
+        await OnblogRank();
+        console.log('Data blogCrawler completed.');
     } catch (error) {
         console.error('Error during scheduled migration:', error);
     }
