@@ -105,6 +105,18 @@ export class BlogModel {
 		}
 	}
 
+	async updateBlogRankData(req) {
+		try {
+			let { id, blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smart_link } = req
+			const query = `UPDATE blogRankManagement SET blog_url = ?, keyword = ?, manager = ?, company_name = ?, registration_date = ?, type = ?, serviceCount = ?, sales = ?, work_detail = ?, smartlink = ? WHERE id = ?`
+			const rs = await mysqlWriteServer.query(query, [blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smart_link, id]);
+			return rs[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 	async getBlogRankData() {
 		try {
 			const now = new Date();

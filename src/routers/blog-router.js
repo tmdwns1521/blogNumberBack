@@ -86,6 +86,15 @@ blogRouter.post('/blogRankData', async (req, res, next) => {
 	}
 });
 
+blogRouter.post('/updateBlogRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.updateBlogRankData(req.body);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
 blogRouter.get('/getBlogRankData', async (req, res, next) => {
 	try {
 		const data = await blogService.getBlogRankData();

@@ -12,9 +12,19 @@ class BlogService {
 		this.blogModel = blogModel;
 	}
 
+
 	async getBlogRankData() {
 		try {
 			return await this.blogModel.getBlogRankData()
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+	async updateBlogRankData(req) {
+		try {
+			return await this.blogModel.updateBlogRankData(req)
 		} catch (e) {
 			console.log(e);
 			return e;
