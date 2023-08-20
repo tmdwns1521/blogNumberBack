@@ -15,7 +15,7 @@ export async function delay(seconds) {
 }
 
 export async function blogViewCrawler(item) {
-    let my_url = item.blog_url.split(',').pop();
+    let my_url = item.blog_url?.split(',').pop();
     let rankCheck = true;
     let page = 1;
     let ranking = 99;
@@ -115,6 +115,9 @@ export async function blogrankCrawler(data) {
             smartBlock(item)
             await delay(2);
             // break
+        } else {
+            blogViewCrawler(item);
+            await delay(2);
         }
     }
 }
