@@ -1,11 +1,10 @@
 import axios from 'axios';
 
 import {mysqlWriteServer, mysqlReadServer} from '../config/database.js';
-
+const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Seoul' };
 export async function blogRankData() {
     const blogRankQuery = 'SELECT * FROM blogRankManagement';
     const rs = await mysqlReadServer.query(blogRankQuery);
-    console.log(rs[0]);
     return rs[0]
 }
 
@@ -30,7 +29,7 @@ export async function blogViewCrawler(item) {
             pageSource = pageSource.split('class=\\"btn_save _keep_trigger\\"')
             pageSource = pageSource.map((item) => item.split('onclick=')[0].split('\\"')[1].split('\\')[0]);
             const rank = pageSource.indexOf(my_url) - 1;
-            // console.log(rank);
+            console.log(rank);
             // console.log(pageSource);
             if (rank >= 0) {
                 ranking = rank + page;
@@ -45,23 +44,30 @@ export async function blogViewCrawler(item) {
         }
 
     }
+    console.log('1');
     await mysqlWriteServer.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${item.id}`);
-    const now = new Date();
-    const year = now.getFullYear();  // 연도 (e.g., 2023)
-    const month = now.getMonth() + 1;  // 월 (0부터 시작하므로 1을 더해줌)
-    const day = now.getDate();  // 일
+    let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
+    now = now.split(' ');
+    now = `${now[0]}-${now[1]}-${now[2]} ${now[3]}`
+    console.log(now);
 
-    const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    const formattedDate = `${now.split(' ')[0]}`
+
+
 
     const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
+    console.log(SelectRankingQuery[0]);
     if (SelectRankingQuery[0].length > 0) {
         const gap = SelectRankingQuery[0][0].rank - ranking;
-        const RankingQuery = "UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'"
+        const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
         await mysqlWriteServer.query(RankingQuery, [ranking, gap, now, item.id]);
+        console.log('VIEW 업데이트')
     } else {
         const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
         await mysqlWriteServer.query(RankingQuery, [item.id, ranking, now]);
+        console.log('VIEW 삽입')
     }
+    console.log('2');
 }
 export async function smartBlock(data) {
     const my_url = data.blog_url.split(',').pop();
@@ -75,23 +81,29 @@ export async function smartBlock(data) {
     if (rank > 0) {
         ranking = rank;
     }
+    console.log('3');
     await mysqlWriteServer.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${data.id}`);
-    const now = new Date();
-    const year = now.getFullYear();  // 연도 (e.g., 2023)
-    const month = now.getMonth() + 1;  // 월 (0부터 시작하므로 1을 더해줌)
-    const day = now.getDate();  // 일
+    let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
+    now = now.split(' ');
+    now = `${now[0]}-${now[1]}-${now[2]} ${now[3]}`
+    console.log(now);
 
-    const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    const formattedDate = `${now.split(' ')[0]}`
+    console.log(formattedDate)
 
     const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, data.id);
+    console.log(SelectRankingQuery[0]);
     if (SelectRankingQuery[0].length > 0) {
         const gap = SelectRankingQuery[0][0].rank - ranking;
-        const RankingQuery = 'UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\''
+        const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
         await mysqlWriteServer.query(RankingQuery, [ranking, gap, now, data.id]);
+        console.log('스마트블록 업데이트')
     } else {
         const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
         await mysqlWriteServer.query(RankingQuery, [data.id, ranking, now]);
+        console.log('스마트블록 삽입')
     }
+    console.log('4');
 }
 export async function blogrankCrawler(data) {
     for (const item of data) {
