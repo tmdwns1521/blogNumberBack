@@ -116,8 +116,24 @@ export async function blogrankCrawler(data) {
             await delay(2);
             // break
         } else {
-            blogViewCrawler(item);
-            await delay(2);
+            let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
+            now = now.split(' ');
+            now = `${now[0]}-${now[1]}-${now[2]} ${now[3]}`
+
+            const formattedDate = `${now.split(' ')[0]}`
+            const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
+            console.log(SelectRankingQuery[0]);
+            if (SelectRankingQuery[0].length > 0) {
+                const gap = SelectRankingQuery[0][0].rank - ranking;
+                const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
+                await mysqlWriteServer.query(RankingQuery, [99, gap, now, item.id]);
+                console.log('NO 업데이트')
+            } else {
+                const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
+                await mysqlWriteServer.query(RankingQuery, [item.id, 99, now]);
+                console.log('NO 삽입')
+            }
+            console.log('4');
         }
     }
 }
