@@ -124,9 +124,8 @@ export async function blogrankCrawler(data) {
             const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
             console.log(SelectRankingQuery[0]);
             if (SelectRankingQuery[0].length > 0) {
-                const gap = SelectRankingQuery[0][0].rank - ranking;
                 const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
-                await mysqlWriteServer.query(RankingQuery, [99, gap, now, item.id]);
+                await mysqlWriteServer.query(RankingQuery, [99, 0, now, item.id]);
                 console.log('NO 업데이트')
             } else {
                 const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';

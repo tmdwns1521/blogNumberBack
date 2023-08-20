@@ -95,6 +95,24 @@ blogRouter.post('/updateBlogRankData', async (req, res, next) => {
 	}
 });
 
+blogRouter.post('/removeBlogRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.removeBlogRankData(req.body.id);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogRouter.post('/extendBlogRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.extendBlogRankData(req.body.id);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
 blogRouter.get('/getBlogRankData', async (req, res, next) => {
 	try {
 		const data = await blogService.getBlogRankData();

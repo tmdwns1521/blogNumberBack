@@ -31,6 +31,25 @@ class BlogService {
 		}
 	}
 
+	async removeBlogRankData(id) {
+		try {
+			return await this.blogModel.removeBlogRankData(id)
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+	async extendBlogRankData(id) {
+		try {
+			return await this.blogModel.extendBlogRankData(id)
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+
 	async blogRankData(req) {
 		try {
 			return await this.blogModel.blogRankData(req)

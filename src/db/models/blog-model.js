@@ -105,6 +105,33 @@ export class BlogModel {
 		}
 	}
 
+	async removeBlogRankData(id) {
+		try {
+			const query = `DELETE FROM blogRankManagement WHERE id = ?`
+			const rs = await mysqlWriteServer.query(query, id);
+			const querys = `DELETE FROM blogRankRecord WHERE blog_id = ?`
+			const rss = await mysqlWriteServer.query(querys, id);
+			return rss[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+	async extendBlogRankData(id) {
+		try {
+			const query = `UPDATE blogRankManagement SET serviceCount = ?, extend_cnt = extend_cnt + 1 WHERE id = ?`
+			const rs = await mysqlWriteServer.query(query, [25, id]);
+			const querys = `DELETE FROM blogRankRecord WHERE blog_id = ?`
+			const rss = await mysqlWriteServer.query(querys, id);
+			return rss[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+
 	async updateBlogRankData(req) {
 		try {
 			let { id, blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smart_link } = req
