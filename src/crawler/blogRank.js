@@ -85,7 +85,7 @@ export async function smartBlock(data) {
     await mysqlWriteServer.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${data.id}`);
     let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
     now = now.split(' ');
-    now = `${now[0]}-${now[1]}-${now[2]} ${now[3]}`
+    now = `${now[0]}-${now[1]}-${now[2]} ${now[3].replaceAll('24','00')}`
     console.log(now);
 
     const formattedDate = `${now.split(' ')[0]}`
@@ -118,7 +118,7 @@ export async function blogrankCrawler(data) {
         } else {
             let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
             now = now.split(' ');
-            now = `${now[0]}-${now[1]}-${now[2]} ${now[3]}`
+            now = `${now[0]}-${now[1]}-${now[2]} ${now[3].replaceAll('24','00')}`
 
             const formattedDate = `${now.split(' ')[0]}`
             const SelectRankingQuery = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
