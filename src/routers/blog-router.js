@@ -94,6 +94,15 @@ blogRouter.post('/blogRankData', async (req, res, next) => {
 	}
 });
 
+blogRouter.post('/checkDeposit', async (req, res, next) => {
+	try {
+		const data = await blogService.checkDeposit(req.body);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
 blogRouter.post('/updateBlogRankData', async (req, res, next) => {
 	try {
 		const data = await blogService.updateBlogRankData(req.body);

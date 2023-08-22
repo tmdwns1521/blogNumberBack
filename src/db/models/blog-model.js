@@ -144,6 +144,18 @@ export class BlogModel {
 		}
 	}
 
+	async checkDeposit(req) {
+		try {
+			let { id, checkDeposit } = req
+			const query = `UPDATE blogRankManagement SET checkDeposit = ? WHERE id = ?`
+			const rs = await mysqlWriteServer.query(query, [checkDeposit, id]);
+			return rs[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 	async getBlogRankData() {
 		try {
 			const now = new Date();

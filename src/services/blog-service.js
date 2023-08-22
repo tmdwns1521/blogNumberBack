@@ -12,6 +12,15 @@ class BlogService {
 		this.blogModel = blogModel;
 	}
 
+	async checkDeposit(req) {
+		try {
+			return await this.blogModel.checkDeposit(req)
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 
 	async getBlogRankData() {
 		try {

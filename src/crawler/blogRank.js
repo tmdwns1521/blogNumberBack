@@ -48,7 +48,7 @@ export async function blogViewCrawler(item) {
     await mysqlWriteServer.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${item.id}`);
     let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
     now = now.split(' ');
-    now = `${now[0]}-${now[1]}-${now[2]} ${now[3]}`
+    now = `${now[0]}-${now[1]}-${now[2]} ${now[3].replaceAll('24','00')}`
     console.log(now);
 
     const formattedDate = `${now.split(' ')[0]}`
