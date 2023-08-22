@@ -1,12 +1,20 @@
 import { Router } from 'express';
 import { blogService } from '../services/index.js';
 import dotenv from 'dotenv';
-import ExcelJS from 'exceljs';
-import fs from 'fs';
+import { OnblogRank } from '../crawler/blogRank.js';
 
 dotenv.config();
 
 const blogRouter = Router();
+
+blogRouter.get('/rankingCheck', async (req, res, next) => {
+	try {
+		await OnblogRank();
+		res.status(201).json("result: sucess");
+	} catch (error) {
+		next(error);
+	}
+});
 
 // 전체 블로그 갯수
 blogRouter.get('/getBlogs', async (req, res, next) => {
