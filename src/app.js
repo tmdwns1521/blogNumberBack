@@ -11,17 +11,7 @@ import migrateData from '../src/utils/migration.js'; // 마이그레이션 함�
 import { OnblogRank } from './crawler/blogRank.js';
 
 // '0 12 * * *'은 매일 12시 0분에 실행됨을 의미합니다.
-cron.schedule('0 12 * * *', async () => {
-    try {
-        console.log('Starting data migration...');
-        await migrateData();
-        console.log('Data migration completed.');
-    } catch (error) {
-        console.error('Error during scheduled migration:', error);
-    }
-});
-
-cron.schedule('*/10 * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
     try {
         console.log('Starting data blogCrawler...');
         console.log(new Date());
@@ -32,6 +22,26 @@ cron.schedule('*/10 * * * *', async () => {
     }
 });
 
+cron.schedule('0 12 * * *', async () => {
+    try {
+        console.log('Starting data blogCrawler...');
+        console.log(new Date());
+        await OnblogRank();
+        console.log('Data blogCrawler completed.');
+    } catch (error) {
+        console.error('Error during scheduled migration:', error);
+    }
+});
+// cron.schedule('*/10 * * * *', async () => {
+//     try {
+//         console.log('Starting data blogCrawler...');
+//         console.log(new Date());
+//         await OnblogRank();
+//         console.log('Data blogCrawler completed.');
+//     } catch (error) {
+//         console.error('Error during scheduled migration:', error);
+//     }
+// });
 // CORS 에러 방지
 app.use(cors());
 
