@@ -121,7 +121,7 @@ export class BlogModel {
 	async extendBlogRankData(id) {
 		try {
 			const query = `UPDATE blogRankManagement SET serviceCount = ?, extend_cnt = extend_cnt + 1 WHERE id = ?`
-			const rs = await mysqlWriteServer.query(query, [25, id]);
+			await mysqlWriteServer.query(query, [25, id]);
 			const querys = `DELETE FROM blogRankRecord WHERE blog_id = ?`
 			const rss = await mysqlWriteServer.query(querys, id);
 			return rss[0];

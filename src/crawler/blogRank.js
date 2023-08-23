@@ -109,10 +109,10 @@ export async function blogrankCrawler(data) {
     for (const item of data) {
         if (item.type === 0 && item.blog_url.split(',').pop() !== '') {
             // console.log(item);
-            blogViewCrawler(item);
+            await blogViewCrawler(item);
             await delay(2);
         } else if (item.type === 1 && item.blog_url.split(',').pop() !== '' && item.smartlink) {
-            smartBlock(item)
+            await smartBlock(item)
             await delay(2);
             // break
         } else {
