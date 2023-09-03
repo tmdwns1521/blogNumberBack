@@ -33,16 +33,16 @@ import { OnblogRank } from './crawler/blogRank.js';
 //     }
 // });
 
-cron.schedule('0 12 * * *', async () => {
-    try {
-        console.log('Starting migration blogCrawler...');
-        console.log(new Date());
-        await migrateData();
-        console.log('Data blogCrawler completed.');
-    } catch (error) {
-        console.error('Error during scheduled migration:', error);
-    }
-});
+// cron.schedule('0 12 * * *', async () => {
+//     try {
+//         console.log('Starting migration blogCrawler...');
+//         console.log(new Date());
+//         await migrateData();
+//         console.log('Data blogCrawler completed.');
+//     } catch (error) {
+//         console.error('Error during scheduled migration:', error);
+//     }
+// });
 // cron.schedule('*/10 * * * *', async () => {
 //     try {
 //         console.log('Starting data blogCrawler...');
