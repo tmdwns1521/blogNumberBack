@@ -71,7 +71,7 @@ export async function placeCrawler(page, placeNumber, keyword) {
         const rs = await axios.post(placeUrl, payload, { headers });
         const items = rs?.data[0]?.data?.restaurants?.items;
         if (items.length === 0) return -1;
-        const findIndex = items.findIndex((item) => item.id === placeNumber) + 1;
+        const findIndex = items.findIndex((item) => item.id === placeNumber);
         if (findIndex === 0) {
             page += 100;
             await sleep(2);
