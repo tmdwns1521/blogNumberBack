@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { blogService } from '../services/index.js';
 import dotenv from 'dotenv';
 import { OnblogRank } from '../crawler/blogRank.js';
+import { OnPlaceRank } from '../crawler/placeRank.js';
 
 dotenv.config();
 
@@ -10,6 +11,15 @@ const blogRouter = Router();
 blogRouter.get('/rankingCheck', async (req, res, next) => {
 	try {
 		await OnblogRank();
+		res.status(201).json("result: sucess");
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogRouter.get('/placeRankingCheck', async (req, res, next) => {
+	try {
+		await OnPlaceRank();
 		res.status(201).json("result: sucess");
 	} catch (error) {
 		next(error);
@@ -94,6 +104,15 @@ blogRouter.post('/blogRankData', async (req, res, next) => {
 	}
 });
 
+blogRouter.post('/placeRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.placeRankData(req.body);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
 blogRouter.post('/checkDeposit', async (req, res, next) => {
 	try {
 		const data = await blogService.checkDeposit(req.body);
@@ -106,6 +125,15 @@ blogRouter.post('/checkDeposit', async (req, res, next) => {
 blogRouter.post('/updateBlogRankData', async (req, res, next) => {
 	try {
 		const data = await blogService.updateBlogRankData(req.body);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogRouter.post('/updatePlaceRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.updatePlaceRankData(req.body);
 		res.status(201).json(data);
 	} catch (error) {
 		next(error);
@@ -133,6 +161,15 @@ blogRouter.post('/extendBlogRankData', async (req, res, next) => {
 blogRouter.get('/getBlogRankData', async (req, res, next) => {
 	try {
 		const data = await blogService.getBlogRankData();
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogRouter.get('/getPlaceRankData', async (req, res, next) => {
+	try {
+		const data = await blogService.getPlaceRankData();
 		res.status(201).json(data);
 	} catch (error) {
 		next(error);

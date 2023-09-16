@@ -105,6 +105,18 @@ export class BlogModel {
 		}
 	}
 
+	async placeRankData(req) {
+		try {
+			let { company_name, keyword, placeNumber, work_detail } = req
+			const query = `INSERT INTO placeRankManagement (company_name, keyword, placeNumber, work_detail) VALUES (?, ?, ?, ?)`
+			const rs = await mysqlWriteServer.query(query, [company_name, keyword, placeNumber, work_detail]);
+			return rs[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 	async removeBlogRankData(id) {
 		try {
 			const query = `DELETE FROM blogRankManagement WHERE id = ?`
@@ -144,6 +156,18 @@ export class BlogModel {
 		}
 	}
 
+	async updatePlaceRankData(req) {
+		try {
+			let { id, keyword, company_name, placeNumber, work_detail } = req
+			const query = `UPDATE placeRankManagement SET keyword = ?, company_name = ?, placeNumber = ?, work_detail = ? WHERE id = ?`
+			const rs = await mysqlWriteServer.query(query, [keyword, company_name, placeNumber, work_detail, id]);
+			return rs[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 	async checkDeposit(req) {
 		try {
 			let { id, checkDeposit } = req
@@ -173,6 +197,29 @@ export class BlogModel {
 				item.count = blog_filter.length;
 			})
 			return {blogs: rs[0], blog_ranks : blog_ranks[0]};
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+	async getPlaceRankData() {
+		try {
+			const now = new Date();
+			const year = now.getFullYear();  // 연도 (e.g., 2023)
+			const month = now.getMonth() + 1;  // 월 (0부터 시작하므로 1을 더해줌)
+			const day = now.getDate();  // 일
+
+			const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+			const rs = await mysqlReadServer.query(`SELECT * FROM placeRankManagement` );
+			let ids = rs[0].map(item => item.placeNumber);
+			ids = ids.join(',');
+			const place_ranks = await mysqlReadServer.query(`SELECT * FROM placeRankRecord WHERE placeNumber IN (${ids})` );
+			rs[0].forEach((item) => {
+				const place_filter = place_ranks[0].filter(e => e.placeNumber === item.id && e.rank <= 5 && e.rank > 0 && String(e.updatedAt).includes(formattedDate) === false);
+				item.count = place_filter.length;
+			})
+			return {places: rs[0], place_ranks : place_ranks[0]};
 		} catch (e) {
 			console.log(e);
 			return e;
