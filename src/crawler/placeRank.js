@@ -142,7 +142,7 @@ export async function placeRankCrawler(data) {
             await sleep(1);
             const reviewData = await placeReview(placeNumber);
             await sleep(1);
-            await mysqlWriteServer.query('UPDATE placeRankManagement SET `rank` = ?, visitCount = ?, ReviewCount = ? WHERE id = ?', [rank, reviewData.visitorReviewsTotal !== 'null' ? reviewData.visitorReviewsTotal : 0, reviewData.reviewCount !== 'null' ? reviewData.reviewCount : 0, item.id]);
+            await mysqlWriteServer.query('UPDATE placeRankManagement SET `rank` = ?, visitCount = ?, ReviewCount = ?, update_at = ? WHERE id = ?', [rank, reviewData.visitorReviewsTotal !== 'null' ? reviewData.visitorReviewsTotal : 0, reviewData.reviewCount !== 'null' ? reviewData.reviewCount : 0, new Date(), item.id]);
         }
         return true;
     } catch (e) {
