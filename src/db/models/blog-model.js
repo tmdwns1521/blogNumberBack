@@ -130,6 +130,19 @@ export class BlogModel {
 		}
 	}
 
+	async removePlaceRankData(id) {
+		try {
+			const query = `DELETE FROM placeRankManagement WHERE id = ?`
+			const rs = await mysqlWriteServer.query(query, id);
+			const querys = `DELETE FROM placeRankRecord WHERE placeNumber = ?`
+			const rss = await mysqlWriteServer.query(querys, id);
+			return rss[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 	async extendBlogRankData(id) {
 		try {
 			const query = `UPDATE blogRankManagement SET serviceCount = ?, extend_cnt = extend_cnt + 1 WHERE id = ?`

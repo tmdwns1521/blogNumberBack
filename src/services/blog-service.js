@@ -67,6 +67,15 @@ class BlogService {
 		}
 	}
 
+	async removePlaceRankData(id) {
+		try {
+			return await this.blogModel.removePlaceRankData(id)
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
 	async extendBlogRankData(id) {
 		try {
 			return await this.blogModel.extendBlogRankData(id)
