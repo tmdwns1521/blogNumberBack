@@ -88,29 +88,24 @@ export async function smartBlock(data) {
     try {
         connectionRead = await mysqlReadServer.getConnection();
         connection = await mysqlWriteServer.getConnection(); // Get a connection from the pool
-        const my_url = data.blog_url.split(',').pop();
+        const my_url = data.blog_url.split(',').pop().split('/').pop();
         let pageSource = await axios.get(data.smartlink);
         let ranking = 99
         pageSource = pageSource.data;
-        pageSource = pageSource.split('title_area');
-        pageSource = pageSource.map((item) => item.split('onclick')[0].split('href=')[1].split('"')[1]);
-        pageSource = pageSource.filter(item => item !== '#');
-        const rank = pageSource.indexOf(my_url);
+        pageSource = pageSource.split('class="fds-ugc-block-mod');
+        const rank = pageSource.findIndex(item => item.includes(my_url));
+        console.log('rank : ', rank);
         if (rank > 0) {
-            ranking = rank;
+            ranking = rank - 1;
         }
-        console.log('3');
         await connection.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${data.id}`);
         let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
         now = now.split(' ');
         now = `${now[0]}-${now[1]}-${now[2]} ${now[3].replaceAll('24','00')}`
-        console.log(now);
 
         const formattedDate = `${now.split(' ')[0]}`
-        console.log(formattedDate)
 
         const SelectRankingQuery = await connectionRead.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, data.id);
-        console.log(SelectRankingQuery[0]);
         if (SelectRankingQuery[0].length > 0) {
             const gap = SelectRankingQuery[0][0].rank - ranking;
             const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
@@ -133,8 +128,8 @@ export async function smartBlock(data) {
 }
 export async function blogrankCrawler(data) {
     for (const item of data) {
+        console.log(item);
         if (item.type === 0 && item.blog_url.split(',').pop() !== '') {
-            // console.log(item);
             await blogViewCrawler(item);
             await delay(2);
         } else if (item.type === 1 && item.blog_url.split(',').pop() !== '' && item.smartlink) {
@@ -153,7 +148,6 @@ export async function blogrankCrawler(data) {
 
                 const formattedDate = `${now.split(' ')[0]}`
                 const SelectRankingQuery = await connectionRead.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
-                console.log(SelectRankingQuery[0]);
                 if (SelectRankingQuery[0].length > 0) {
                 const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
                 await connection.query(RankingQuery, [99, 0, now, item.id]);

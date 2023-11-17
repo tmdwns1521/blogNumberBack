@@ -112,7 +112,7 @@ export async function placeCrawler(page, placeNumber, keyword, headers) {
         const items = rs?.data[0]?.data?.businesses?.items;
         if (items.length === 0) return -1;
         const findIndex = items.findIndex((item) => item.id === placeNumber);
-        if (findIndex <= 0) {
+        if (findIndex < 0) {
             page += 100;
             await sleep(2);
             return placeCrawler(page, placeNumber, keyword, headers);
@@ -135,13 +135,15 @@ export async function placeRankCrawler(data) {
             let page = 1;
             let rank;
             if (item.type === 0) {
+                console.log('type 1');
                 rank = await restaurantCrawler(page, placeNumber, keyword, headers);
             } else if (item.type === 1) {
+                console.log('type 2');
                 rank = await placeCrawler(page, placeNumber, keyword, headers);
             }
             await sleep(1);
             const reviewData = await placeReview(placeNumber);
-            await sleep(1);
+            await sleep(2);
             await mysqlWriteServer.query('UPDATE placeRankManagement SET `rank` = ?, visitCount = ?, ReviewCount = ?, update_at = ? WHERE id = ?', [rank, reviewData.visitorReviewsTotal !== 'null' ? reviewData.visitorReviewsTotal : 0, reviewData.reviewCount !== 'null' ? reviewData.reviewCount : 0, new Date(), item.id]);
         }
         return true;
