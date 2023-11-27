@@ -30,13 +30,12 @@ export async function blogViewCrawler(item) {
                 if (page > 100) {
                     rankCheck = false;
                 }
-                let pageSource = await axios.get(`https://s.search.naver.com/p/review/search.naver?rev=44&where=view&api_type=11&start=${page}&query=${item.keyword}&nso=&nqx_theme=&main_q=&mode=normal&q_material=&ac=1&aq=1&spq=0&st_coll=&topic_r_cat=&nx_search_query=&nx_and_query=&nx_sub_query=&prank=61&sm=tab_jum&ssc=tab.view.view&ngn_country=KR&lgl_rcode=09620101&fgn_region=&fgn_city=&lgl_lat=37.4779619&lgl_long=126.9534602&abt=&_callback=viewMoreContents`);
+                const urlLink = `https://s.search.naver.com/p/review/46/search.naver?rev=44&where=view&api_type=11&start=${page}&query=${item.keyword}`;
+                let pageSource = await axios.get(urlLink);
                 pageSource = pageSource.data;
-                pageSource = pageSource.split('class=\\"btn_save _keep_trigger\\"')
-                pageSource = pageSource.map((item) => item.split('onclick=')[0].split('\\"')[1].split('\\')[0]);
+                pageSource = pageSource.split('class=\\"title_link _cross_trigger\\"')
+                pageSource = pageSource.map((item) => item.split('href=')[1].split('\\"')[1].split('\\')[0]);
                 const rank = pageSource.indexOf(my_url) - 1;
-                console.log(rank);
-                // console.log(pageSource);
                 if (rank >= 0) {
                     ranking = rank + page;
                     break;
@@ -48,7 +47,6 @@ export async function blogViewCrawler(item) {
                 console.log(e);
                 break;
             }
-
         }
         console.log('1');
         await connection.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${item.id}`);
