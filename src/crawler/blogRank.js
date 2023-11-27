@@ -72,6 +72,7 @@ export async function blogViewCrawler(item) {
             console.log('VIEW 삽입')
         }
         console.log('2');
+        return ranking;
     } catch (error) {
         console.error(error);
     } finally {
@@ -115,6 +116,7 @@ export async function smartBlock(data) {
             console.log('스마트블록 삽입')
         }
         console.log('4');
+        return ranking;
     } catch (error) {
         console.error(error);
     } finally {
@@ -124,50 +126,61 @@ export async function smartBlock(data) {
     }
 
 }
+
 export async function blogrankCrawler(data) {
     for (const item of data) {
-        console.log(item);
-        if (item.type === 0 && item.blog_url.split(',').pop() !== '') {
-            await blogViewCrawler(item);
-            await delay(2);
-        } else if (item.type === 1 && item.blog_url.split(',').pop() !== '' && item.smartlink) {
-            await smartBlock(item)
-            await delay(2);
-            // break
-        } else {
-            let connection = null;
-            let connectionRead = null;
-            try {
-                connectionRead = await mysqlReadServer.getConnection();
-                connection = await mysqlWriteServer.getConnection(); // Get a connection from the pool
-                let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
-                now = now.split(' ');
-                now = `${now[0]}-${now[1]}-${now[2]} ${now[3].replaceAll('24','00')}`
+        await checkRank(item)
+    }
+}
 
-                const formattedDate = `${now.split(' ')[0]}`
-                const SelectRankingQuery = await connectionRead.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
-                if (SelectRankingQuery[0].length > 0) {
-                const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
-                await connection.query(RankingQuery, [99, 0, now, item.id]);
-                console.log('NO 업데이트')
-                } else {
-                const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
-                await connection.query(RankingQuery, [item.id, 99, now]);
-                console.log('NO 삽입')
-                }
-                console.log('4');
-            } catch (error) {
-                console.error(error);
-            } finally {
-                if (connection) {
-                    connection.release(); // Ensure the connection is released in case of an error
-                }
+export async function checkRank(item) {
+    let rank;
+    let now;
+    now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
+    now = now.split(' ');
+    now = `${now[0]}-${now[1]}-${now[2]} ${now[3].replaceAll('24','00')}`
+    if (parseInt(item.type) === 0 && item.blog_url.split(',').pop() !== '') {
+        rank = await blogViewCrawler(item);
+        await delay(2);
+    } else if (parseInt(item.type) === 1 && item.blog_url.split(',').pop() !== '' && item.smartlink) {
+        rank = await smartBlock(item)
+        await delay(2);
+        // break
+    } else {
+        let connection = null;
+        let connectionRead = null;
+        try {
+            connectionRead = await mysqlReadServer.getConnection();
+            connection = await mysqlWriteServer.getConnection(); // Get a connection from the pool
+
+            const formattedDate = `${now.split(' ')[0]}`
+            const SelectRankingQuery = await connectionRead.query(`SELECT * FROM blogRankRecord WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\' LIMIT 1`, item.id);
+            if (SelectRankingQuery[0].length > 0) {
+            const RankingQuery = `UPDATE blogRankRecord SET \`rank\` = ?, gap = ?, updatedAt = ? WHERE blog_id = ? AND DATE_FORMAT(updatedAt, \'%Y-%m-%d\') = \'${formattedDate}\'`
+            await connection.query(RankingQuery, [99, 0, now, item.id]);
+            console.log('NO 업데이트')
+            } else {
+            const RankingQuery = 'INSERT INTO blogRankRecord (blog_id, \`rank\`, updatedAt) VALUES (?, ?, ?)';
+            await connection.query(RankingQuery, [item.id, 99, now]);
+            console.log('NO 삽입')
+            }
+            console.log('4');
+        } catch (error) {
+            console.error(error);
+        } finally {
+            if (connection) {
+                connection.release(); // Ensure the connection is released in case of an error
             }
         }
     }
+    return { updated_at: now, ranking: rank };
 }
 
 export async function OnblogRank() {
     const data = await blogRankData()
     await blogrankCrawler(data);
+}
+
+export async function IndividualRank(item) {
+    return await checkRank(item);
 }

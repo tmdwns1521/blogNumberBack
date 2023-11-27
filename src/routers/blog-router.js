@@ -3,6 +3,7 @@ import { blogService } from '../services/index.js';
 import dotenv from 'dotenv';
 import { OnblogRank } from '../crawler/blogRank.js';
 import { OnPlaceRank } from '../crawler/placeRank.js';
+import { IndividualRank } from '../crawler/blogRank.js';
 
 dotenv.config();
 
@@ -16,6 +17,17 @@ blogRouter.get('/rankingCheck', async (req, res, next) => {
 		next(error);
 	}
 });
+
+blogRouter.post('/individual-rank', async (req, res, next) => {
+	try {
+		const result = await IndividualRank(req.body);
+		console.log(result);
+		res.status(201).json(result);
+	} catch (error) {
+		next(error);
+	}
+});
+
 
 blogRouter.get('/placeRankingCheck', async (req, res, next) => {
 	try {
