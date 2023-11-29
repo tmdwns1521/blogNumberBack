@@ -156,11 +156,13 @@ class BlogService {
 		}
 	}
 
-
-
-
-
-
+	async countUpdate(data) {
+		try {
+			return await this.blogModel.countUpdate(data)
+		} catch (e) {
+			console.log(e);
+		}
+	}
 
 	// 회원가입
 	async addUser(userInfo) {

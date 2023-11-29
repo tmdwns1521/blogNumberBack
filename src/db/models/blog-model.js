@@ -156,6 +156,18 @@ export class BlogModel {
 		}
 	}
 
+	async countUpdate(data) {
+		try {
+			const query = `UPDATE blogRankManagement SET count = ? WHERE id = ?`
+			const result = await mysqlWriteServer.query(query, [parseInt(data.count), data.id]);
+			return result[0];
+		} catch (e) {
+			console.log(e);
+			return e;
+		}
+	}
+
+
 
 	async updateBlogRankData(req) {
 		try {
@@ -207,7 +219,7 @@ export class BlogModel {
 			const blog_ranks = await mysqlReadServer.query(`SELECT * FROM blogRankRecord WHERE blog_id IN (${ids})` );
 			rs[0].forEach((item) => {
 				const blog_filter = blog_ranks[0].filter(e => e.blog_id === item.id && e.rank <= 5 && e.rank > 0 && String(e.updatedAt).includes(formattedDate) === false);
-				item.count = blog_filter.length;
+				item.counting = blog_filter.length;
 			})
 			return {blogs: rs[0], blog_ranks : blog_ranks[0]};
 		} catch (e) {

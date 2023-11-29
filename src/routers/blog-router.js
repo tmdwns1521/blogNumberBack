@@ -9,6 +9,15 @@ dotenv.config();
 
 const blogRouter = Router();
 
+blogRouter.post('/countUpdate', async (req, res, next) => {
+	try {
+		const result = await blogService.countUpdate(req.body);
+		res.status(201).json(result);
+	} catch (error) {
+		next(error);
+	}
+});
+
 blogRouter.get('/rankingCheck', async (req, res, next) => {
 	try {
 		await OnblogRank();

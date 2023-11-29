@@ -44,7 +44,7 @@ export async function blogViewCrawler(item) {
                 }
                 await delay(2);
             } catch (e) {
-                console.log(e);
+                // console.log(e);
                 break;
             }
         }
@@ -93,7 +93,6 @@ export async function smartBlock(data) {
         pageSource = pageSource.data;
         pageSource = pageSource.split('class="fds-ugc-block-mod');
         const rank = pageSource.findIndex(item => item.includes(my_url));
-        console.log('rank : ', rank);
         if (rank > 0) {
             ranking = rank - 1;
         }
@@ -134,6 +133,7 @@ export async function blogrankCrawler(data) {
 }
 
 export async function checkRank(item) {
+    console.log(item);
     let rank;
     let now;
     now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
