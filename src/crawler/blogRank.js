@@ -21,20 +21,21 @@ export async function blogViewCrawler(item) {
     try {
         connection = await mysqlWriteServer.getConnection(); // Get a connection from the pool
         connectionRead = await mysqlReadServer.getConnection();
-        let my_url = item.blog_url?.split(',').pop();
+        let my_url = item.blog_url?.split(',').pop().replace('//m.', '//');
         let rankCheck = true;
         let page = 1;
+        console.log('조회중입니다.');
         let ranking = 99;
         while (rankCheck) {
             try {
                 if (page > 100) {
                     rankCheck = false;
                 }
-                const urlLink = `https://s.search.naver.com/p/review/46/search.naver?rev=44&where=view&api_type=11&start=${page}&query=${item.keyword}`;
+                const urlLink = `https://search.naver.com/search.naver?sm=tab_hty.top&where=view&query=${item.keyword}&start=${page}`;
                 let pageSource = await axios.get(urlLink);
                 pageSource = pageSource.data;
-                pageSource = pageSource.split('class=\\"title_link _cross_trigger\\"')
-                pageSource = pageSource.map((item) => item.split('href=')[1].split('\\"')[1].split('\\')[0]);
+                pageSource = pageSource.split('<div class="title_area">')
+                pageSource = pageSource.map((item) => item.split('href="')[1].split('"')[0]);
                 const rank = pageSource.indexOf(my_url) - 1;
                 if (rank >= 0) {
                     ranking = rank + page;
@@ -44,7 +45,7 @@ export async function blogViewCrawler(item) {
                 }
                 await delay(2);
             } catch (e) {
-                // console.log(e);
+                console.log(e);
                 break;
             }
         }
