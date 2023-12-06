@@ -36,6 +36,7 @@ export async function blogViewCrawler(item) {
                 pageSource = pageSource.data;
                 pageSource = pageSource.split('<div class="title_area">')
                 pageSource = pageSource.map((item) => item.split('href="')[1].split('"')[0]);
+                pageSource = pageSource.filter((item) => !item.includes('adcr'))
                 const rank = pageSource.indexOf(my_url) - 1;
                 if (rank >= 0) {
                     ranking = rank + page;
