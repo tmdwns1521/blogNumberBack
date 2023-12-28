@@ -6,31 +6,35 @@ export class BlogModel {
 		try {
 			console.log('조회중');
 			// const blogs = await mysqlRead.query('SELECT COUNT(*) FROM check_blog');
-			const [ UsedBlogs, UsedBlogsOn] = await Promise.all([
-				// mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_marketing = 0'),
-				// mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check <> 0 AND is_marketing = 0'),
-				// mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_check = 1 AND is_marketing = 0'),
-				// mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization <> 0 AND is_marketing = 0'),
-				// mysqlRead.query('SELECT COUNT(*) FROM check_blog WHERE is_Optimization = 1 AND is_marketing = 0'),
-				mysqlReadServer.query('SELECT COUNT(*) FROM check_blog WHERE is_used <> 0 AND is_marketing = 0'),
-				mysqlReadServer.query('SELECT COUNT(*) FROM check_blog WHERE is_used = 1 AND is_marketing = 0')
+			const [ blogValid, blogValidOn, OptimizationValid, OptimizationValidOn, CafeValid, CafeValidOn, cafeNumberOn ] = await Promise.all([
+				mysqlRead.query('SELECT COUNT(*) as COUNT FROM blog_valid'),
+				mysqlRead.query('SELECT COUNT(*) as COUNT FROM blog_valid WHERE is_valid = 1'),
+				mysqlRead.query('SELECT COUNT(*) as COUNT FROM optimization_valid'),
+				mysqlRead.query('SELECT COUNT(*) as COUNT FROM optimization_valid WHERE is_optimization = 1'),
+				mysqlRead.query('SELECT COUNT(*) as COUNT FROM cafe_valid'),
+				mysqlRead.query('SELECT COUNT(*) as COUNT FROM cafe_valid WHERE is_cafe_valid = 1'),
+				mysqlRead.query('SELECT cv.blog_id as cvBlogId, cu.blog_id cuBlogId, cu.is_used, cv.number, cv.is_cafe_valid, ov.blog_id, ov.logic FROM cafe_valid cv LEFT JOIN cafe_used cu ON cv.blog_id = cu.blog_id LEFT JOIN optimization_valid ov ON ov.blog_id = cv.blog_id WHERE cu.is_used IS NULL AND cv.is_cafe_valid = 1'),
+				// mysqlReadServer.query('SELECT COUNT(*) FROM check_blog WHERE is_used = 1 AND is_marketing = 0')
 			]);
-			// const blogsCount = blogs[0][0]['COUNT(*)'];
-			// const checkBlogsCount = checkBlogs[0][0]['COUNT(*)'];
-			// const checkBLogsOnCount = checkBLogsOn[0][0]['COUNT(*)'];
-			// const OptimizationBlogsCount = OptimizationBlogs[0][0]['COUNT(*)'];
-			// const OptimizationBlogsOnCount = OptimizationBlogsOn[0][0]['COUNT(*)'];
-			const UsedBlogsCount = UsedBlogs[0][0]['COUNT(*)'];
-			const UsedBlogsOnCount = UsedBlogsOn[0][0]['COUNT(*)'];
+			
+
+			const blogsCount = blogValid[0][0]['COUNT'];
+			const checkBlogOnCount = blogValidOn[0][0]['COUNT'];
+			const checkOptimizationValidCount = OptimizationValid[0][0]['COUNT'];
+			const checkOptimizationValidOnCount = OptimizationValidOn[0][0]['COUNT'];
+			const checkCafeValidCount = CafeValid[0][0]['COUNT'];
+			const checkCafeValidOnCount = CafeValidOn[0][0]['COUNT'];
+			const checkCafeNumberOn = cafeNumberOn[0];
+
 
 			return {
-				// "blogs": blogsCount,
-				// "checkBlogsCount": checkBlogsCount,
-				// "checkBLogsOnCount": checkBLogsOnCount,
-				// "OptimizationBlogsCount": OptimizationBlogsCount,
-				// "OptimizationBlogsOnCount": OptimizationBlogsOnCount,
-				"UsedBlogsCount": UsedBlogsCount,
-				"UsedBlogsOnCount": UsedBlogsOnCount
+				blogsCount,
+				checkBlogOnCount,
+				checkOptimizationValidCount,
+				checkOptimizationValidOnCount,
+				checkCafeValidCount,
+				checkCafeValidOnCount,
+				checkCafeNumberOn
 			};
 		} catch (e) {
 			return e
