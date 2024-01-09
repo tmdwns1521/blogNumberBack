@@ -86,14 +86,24 @@ export class BlogModel {
 
 	async getNumberBlogsText() {
 		try {
-			const NumberBlogs = await mysqlReadServer.query('SELECT * FROM check_blog WHERE is_used = 1 AND is_marketing = 0');
-			const NumberIds = NumberBlogs[0].map((e) => e.id).join(',');
-			mysqlWriteServer.query(`UPDATE check_blog SET is_marketing = 2 WHERE id IN (${NumberIds})`);
-			return {"NumberBlogs": NumberBlogs[0] };
-		} catch (e) {
+    		const NumberBlogs = await mysqlRead.query('SELECT cv.*, ov.* FROM cafe_valid cv JOIN optimization_valid ov ON cv.blog_id = ov.blog_id WHERE cv.is_cafe_valid = 1');
+
+			const insertPromises = NumberBlogs[0].map(async (item) => {
+			  const blog_id = item.blog_id;
+			  const is_used = 2;
+			  try {
+				await mysqlWrite.query("INSERT INTO cafe_used (blog_id, is_used) VALUES (?, ?)", [blog_id, is_used]);
+			  } catch (error) {
+				  // pass
+			  }
+			});
+
+			await Promise.all(insertPromises);
+
+			return { "NumberBlogs": NumberBlogs[0] };
+		  } catch (e) {
 			return e;
 		}
-
 	}
 
 	async blogRankData(req) {
