@@ -109,7 +109,7 @@ export class BlogModel {
 	async blogRankData(req) {
 		try {
 			let { blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smart_link } = req
-			sales = sales.replaceAll(',', '');
+			sales = Number(sales.replaceAll(',', ''));
 			const query = `INSERT INTO blogRankManagement (blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smartlink) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 			const rs = await mysqlWriteServer.query(query, [blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smart_link]);
 			return rs[0];
@@ -186,6 +186,7 @@ export class BlogModel {
 	async updateBlogRankData(req) {
 		try {
 			let { id, blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smartlink } = req
+			sales = Number(sales.replaceAll(',', ''))
 			const query = `UPDATE blogRankManagement SET blog_url = ?, keyword = ?, manager = ?, company_name = ?, registration_date = ?, type = ?, serviceCount = ?, sales = ?, work_detail = ?, smartlink = ? WHERE id = ?`
 			const rs = await mysqlWriteServer.query(query, [blog_url, keyword, manager, company_name, registration_date, type, serviceCount, sales, work_detail, smartlink, id]);
 			return rs[0];
