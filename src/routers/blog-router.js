@@ -47,6 +47,15 @@ blogRouter.get('/placeRankingCheck', async (req, res, next) => {
 	}
 });
 
+blogRouter.post('/individual-place', async (req, res, next) => {
+	try {
+		const result = await OnPlaceRank(req.body);
+		res.status(201).json(result);
+	} catch (error) {
+		next(error);
+	}
+});
+
 // 전체 블로그 갯수
 blogRouter.get('/getBlogs', async (req, res, next) => {
 	try {
@@ -151,6 +160,17 @@ blogRouter.post('/updateBlogRankData', async (req, res, next) => {
 		next(error);
 	}
 });
+
+blogRouter.post('/updateAllBlogRankData', async (req, res, next) => {
+	try {
+		// console.log(transformedData);
+		const data = await blogService.updateAllBlogRankData(req.body.updateData);
+		res.status(201).json(data);
+	} catch (error) {
+		next(error);
+	}
+});
+
 
 blogRouter.post('/updatePlaceRankData', async (req, res, next) => {
 	try {

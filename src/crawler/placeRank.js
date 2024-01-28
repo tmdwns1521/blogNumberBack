@@ -129,29 +129,33 @@ export async function placeRankCrawler(data) {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
         }
     try {
+        let updatedAt;
+        let rank;
         for (const item of data) {
             const keyword = item.keyword;
             const placeNumber = item.placeNumber;
+            const itemType = Number(item.type);
+            const itemId = Number(item.id);
+            updatedAt = new Date();
             let page = 1;
-            let rank;
-            if (item.type === 0) {
+            if (itemType === 0) {
                 console.log('type 1');
                 rank = await restaurantCrawler(page, placeNumber, keyword, headers);
-            } else if (item.type === 1) {
+            } else if (itemType === 1) {
                 console.log('type 2');
                 rank = await placeCrawler(page, placeNumber, keyword, headers);
             }
             await sleep(1);
             const reviewData = await placeReview(placeNumber);
             await sleep(2);
-            await mysqlWriteServer.query('UPDATE placeRankManagement SET `rank` = ?, visitCount = ?, ReviewCount = ?, update_at = ? WHERE id = ?', [rank, reviewData.visitorReviewsTotal !== 'null' ? reviewData.visitorReviewsTotal : 0, reviewData.reviewCount !== 'null' ? reviewData.reviewCount : 0, new Date(), item.id]);
+            await mysqlWriteServer.query('UPDATE placeRankManagement SET `rank` = ?, visitCount = ?, ReviewCount = ?, update_at = ? WHERE id = ?', [rank, reviewData.visitorReviewsTotal !== 'null' ? reviewData.visitorReviewsTotal : 0, reviewData.reviewCount !== 'null' ? reviewData.reviewCount : 0, updatedAt, itemId]);
         }
-        return true;
+        return {updated_at: updatedAt, ranking: rank };
     } catch (e) {
         console.log(e);
     }
 }
-export async function OnPlaceRank() {
-    const data = await placeRankData()
-    await placeRankCrawler(data);
+export async function OnPlaceRank(place) {
+    const data = place === undefined ? await placeRankData() : [place];
+    return await placeRankCrawler(data);
 }
