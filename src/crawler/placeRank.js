@@ -28,7 +28,13 @@ export async function placeReview(placeNumber) {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
         }
         const rs = await axios.get(placeUrl, { headers });
-        const reviewCount = rs.data.split('"fsasReviews":')[1].split('"maxItemCount"')[0].split('"total":')[1].split(',')[0];
+        let reviewCount = rs.data.split('"FsasReviewsResult"');
+        reviewCount = reviewCount[1];
+        reviewCount = reviewCount.split('"maxItemCount"');
+        reviewCount = reviewCount[0];
+        reviewCount = reviewCount.split('"total":');
+        reviewCount = reviewCount[1];
+        reviewCount = reviewCount.split(',')[0];
         const visitorReviewsTotal = rs.data.split('"visitorReviewsTotal":')[1].split(',')[0];
         return {reviewCount: reviewCount, visitorReviewsTotal: visitorReviewsTotal}
     } catch (error) {
