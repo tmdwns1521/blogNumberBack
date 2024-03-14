@@ -44,7 +44,6 @@ export async function placeReview(placeNumber) {
 
 export async function restaurantCrawler(page, placeNumber, keyword, headers) {
     try {
-        console.log(page);
         const placeUrl = 'https://api.place.naver.com/graphql';
         const payload = [
             {
@@ -154,6 +153,7 @@ export async function placeRankCrawler(data) {
             await sleep(1);
             const reviewData = await placeReview(placeNumber);
             await sleep(2);
+            await mysqlWriteServer.query('UPDATE placeRankManagement SET prev_rank = `rank`, `rank` = "0" WHERE id = ?', itemId);
             await mysqlWriteServer.query('UPDATE placeRankManagement SET `rank` = ?, visitCount = ?, ReviewCount = ?, update_at = ? WHERE id = ?', [rank, reviewData.visitorReviewsTotal !== 'null' ? reviewData.visitorReviewsTotal : 0, reviewData.reviewCount !== 'null' ? reviewData.reviewCount : 0, updatedAt, itemId]);
         }
         return {updated_at: updatedAt, ranking: rank };
