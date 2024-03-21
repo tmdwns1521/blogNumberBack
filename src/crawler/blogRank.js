@@ -31,7 +31,7 @@ export async function blogViewCrawler(item) {
                 if (page > 100) {
                     rankCheck = false;
                 }
-                const urlLink = `https://search.naver.com/search.naver?sm=tab_hty.top&where=view&query=${item.keyword}&start=${page}`;
+                const urlLink = `https://search.naver.com/search.naver?ssc=tab.blog.all&sm=tab_jum&query=${item.keyword}&start=${page}`;
                 let pageSource = await axios.get(urlLink);
                 pageSource = pageSource.data;
                 pageSource = pageSource.split('<div class="title_area">')
@@ -51,6 +51,7 @@ export async function blogViewCrawler(item) {
             }
         }
         console.log('1');
+        console.log(ranking);
         await connection.query(`UPDATE blogRankManagement SET \`rank\` = ${ranking} WHERE id = ${item.id}`);
         let now = new Date().toLocaleString('ko-KR', options).replaceAll('.', '');
         now = now.split(' ');
